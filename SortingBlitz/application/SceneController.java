@@ -2,6 +2,7 @@ package application;
 import javafx.stage.Stage;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -38,16 +39,58 @@ public class SceneController {
 	        this.stage = stage;
 	        Group root = new Group();
 	        scene = new Scene(root);
-
+	        Canvas canvas = new Canvas(SceneController.WINDOW_WIDTH, SceneController.WINDOW_HEIGHT);    
+		    GraphicsContext gc = canvas.getGraphicsContext2D();
+	        
+	        Image backgroundImage = new Image("assets/bg_whole.png");
+	        
+	        Pane mainPane = new Pane();
+		    mainPane.setPrefSize(SceneController.screenWidth, SceneController.screenHeight);
+		    
+ 		   
+		    Rectangle rectangle = new Rectangle(0, 0, SceneController.screenWidth, SceneController.screenHeight);
+		    rectangle.setFill(new ImagePattern(backgroundImage)); 
+		    mainPane.getChildren().add(rectangle); 
+		    
+		    root.getChildren().addAll(mainPane, canvas);
+		    
 	        VBox buttonContainer = new VBox();
 	        buttonContainer.setAlignment(Pos.CENTER); // Align the VBox contents to the center
+	        buttonContainer.setPrefSize(SceneController.screenWidth, SceneController.screenHeight);
 	        
-	        Button button1 = new Button("Button 1");
-	        button1.setOnAction(event -> switchToGame(event));
+	        
+	        
+//	        START BUTTON
+	        Image buttonImage1 = new Image("assets/buttons/B_Start1.png");
+	        Image buttonImage2 = new Image("assets/buttons/B_Start2.png");
+	        Image buttonImage3 = new Image("assets/buttons/B_Start3.png");
+	        ImageView imageView = new ImageView(buttonImage1);
+	        imageView.setFitWidth(120); // Set width of the image
+	        imageView.setFitHeight(120); // Set height of the image
+	        imageView.setPreserveRatio(true); 
+	        
+	        Button strBtn = new Button();
+	        strBtn.setGraphic(imageView);
+	        
 
-	        buttonContainer.getChildren().addAll(button1);
+	        strBtn.setStyle("-fx-background-color: transparent; -fx-background-insets: 0;");
+	        strBtn.setPrefWidth(120); 
+	        strBtn.setPrefHeight(120);
+	        strBtn.setOnAction(event -> switchToGame(event));
+	        
+	        // Add hover effect
+	        strBtn.setOnMouseEntered(e -> {
+	        	imageView.setImage(buttonImage3);	        		        
+	        });
 
+	        strBtn.setOnMouseExited(e -> {
+	        	imageView.setImage(buttonImage1);
+	        });
+	        
+	        buttonContainer.getChildren().addAll(strBtn);
 	        root.getChildren().add(buttonContainer);
+	        
+
 	        stage.setScene(scene);
 	        
 	        // Set window dimensions to match screen size
@@ -60,39 +103,43 @@ public class SceneController {
 	        
 	    }
 	 
+
 	 public void switchToGame(ActionEvent event) {
-		    Group root = new Group();        
-		    Canvas canvas = new Canvas(SceneController.WINDOW_WIDTH, SceneController.WINDOW_HEIGHT);    
+		    Pane root = new Pane(); // Create a new Pane instance
+		    scene.setRoot(root); // Set the new Pane as the root of the scene
+		    
+		    // Create game content
+		    Canvas canvas = new Canvas(SceneController.WINDOW_WIDTH, SceneController.WINDOW_HEIGHT);
 		    GraphicsContext gc = canvas.getGraphicsContext2D();
-		    		  
+		    
 		    Image backgroundImage = new Image("assets/asset_bg.png");
-		    		   
+		    
 		    Pane mainPane = new Pane();
 		    mainPane.setPrefSize(SceneController.screenWidth, SceneController.screenHeight);
-		    		   
+		    
 		    Rectangle rectangle = new Rectangle(0, 0, SceneController.screenWidth * 0.8, SceneController.screenHeight);
 		    rectangle.setFill(new ImagePattern(backgroundImage)); 
-		    mainPane.getChildren().add(rectangle); 
+		    mainPane.getChildren().add(rectangle);
 		    
-
 		    double sideWidth = SceneController.screenWidth * 0.2;
 		    Rectangle sideRectangle = new Rectangle(SceneController.screenWidth * 0.8, 0, sideWidth, SceneController.screenHeight);
 		    sideRectangle.setFill(Color.INDIGO); 
-		    mainPane.getChildren().add(sideRectangle); 
+		    mainPane.getChildren().add(sideRectangle);
 		    
-		   
-		   
 		    root.getChildren().addAll(mainPane, canvas);
 		    
-		    Scene scene2 = new Scene(root, SceneController.WINDOW_WIDTH, SceneController.WINDOW_HEIGHT);
-		    GameTimer gametimer = new GameTimer(gc, scene2);
-		    stage.setScene(scene2);
+		    // Set the same scene with updated content
+		    stage.setScene(scene);
 		    stage.setWidth(SceneController.WINDOW_WIDTH);
 		    stage.setHeight(SceneController.WINDOW_HEIGHT);
 		    stage.setFullScreen(true);
-		    stage.show();
+		    
+		    // Start the game timer
+		    GameTimer gametimer = new GameTimer(gc, scene);
 		    gametimer.start();
 		}
+
+
 
 	
 }
