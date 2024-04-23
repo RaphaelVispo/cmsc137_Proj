@@ -41,6 +41,10 @@ public class Potion extends sprite{
 		this.loadImage(img);
 		this.color = color;
 	}
+	
+	public boolean getIfBomb() {
+		return this.isBomb;
+	}
 
 
 

@@ -21,6 +21,7 @@ public class GameTimer extends AnimationTimer {
   
 	private Scene scene;
 	private Cauldron playerCauldron;
+	private Player newPlayer;
 	  
 	private ArrayList<Cauldron> cauldronList = new ArrayList<Cauldron>();
 	private ArrayList<Potion> potionList = new ArrayList<Potion>();
@@ -40,7 +41,6 @@ public class GameTimer extends AnimationTimer {
 	private Potion draggedPotion = null; // Track the potion being dragged
 	
 	
-	private int score = 0;
 	private Potion potionCollided;
 	
 	Map<String, Double> cauldronSizes = new HashMap<>();
@@ -62,6 +62,7 @@ public class GameTimer extends AnimationTimer {
         this.loadImg();
         this.generateCauldron();
         this.generatePotion();
+        this.newPlayer = new Player(0);
         
         // Register event handlers
         theScene.setOnMousePressed(this::onMousePressed);
@@ -82,7 +83,6 @@ public class GameTimer extends AnimationTimer {
  
         renderCauldron();
         renderPotion();
-        
         
         checkPotionCauldronCollision(); 
     }
@@ -209,7 +209,10 @@ public class GameTimer extends AnimationTimer {
                     iterator.remove(); // Use iterator's remove() method to safely remove the potion (used to avoid error)
                     generateNewPotion(potionsToAdd);
                     if (potion.getPotionColor().equals(cauldron.getCauldronColor())) {
-                        this.score += 100;
+                    	this.newPlayer.addPoints();
+                    }
+                    if (potion.getIfBomb()) {
+                    	this.newPlayer.deductPoints();
                     }
                     break; 
                 }
