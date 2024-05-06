@@ -1,17 +1,5 @@
-# Hello Guys to our Project in CMSC 137!!
+Use Eclipse and follow the configuration here:
 
-How to navigate the files:
-```
-Main.java -> SceneController.java -> GameTimer
-```
+https://www.youtube.com/watch?v=nz8P528uGjk&fbclid=IwAR12iX0-Sj6OjoZmsZS0Za31pLOsJXYNuEVCJFH9wuY9QM2HkOQ2kdn9S4U
 
-## Important Files 
-
-* `Main.java` - where the main scene is launched.
-* `SceneController.java` - dito binuo yung intro scene and yung papuntang game
-* `Gametimer.java` - yung actual game implementation
-
-Todo: 
-* prefferebly naka separate folder yong images and yung sprites.
-* Hopefully magawa yung 4 na couldron and players mechanics this milestone 
-* try niyo narin maglagay kung saan yung magiging chat sa yung UI
+as is na siya na mismong JavaFX project ang SortingBlitz folder
