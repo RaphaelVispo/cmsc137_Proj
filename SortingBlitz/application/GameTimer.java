@@ -11,6 +11,15 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.geometry.Insets;
+
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+
 
 
 public class GameTimer extends AnimationTimer {
@@ -25,9 +34,6 @@ public class GameTimer extends AnimationTimer {
 	  
 	private ArrayList<Cauldron> cauldronList = new ArrayList<Cauldron>();
 	private ArrayList<Potion> potionList = new ArrayList<Potion>();
-	
-	
-
 	
 
 	Map <String, Image> cauldronImg = new HashMap<String, Image>();
@@ -46,6 +52,10 @@ public class GameTimer extends AnimationTimer {
 	Map<String, Double> cauldronSizes = new HashMap<>();
 	Map<String, Double> potionSizes = new HashMap<>();
 	int numOfPotion = 8;
+	
+	
+
+
 
     GameTimer(GraphicsContext gc, Scene theScene){
     	
@@ -63,15 +73,18 @@ public class GameTimer extends AnimationTimer {
         this.generateCauldron();
         this.generatePotion();
         this.newPlayer = new Player(0);
-        
+
         // Register event handlers
         theScene.setOnMousePressed(this::onMousePressed);
         theScene.setOnMouseDragged(this::onMouseDragged);
         theScene.setOnMouseReleased(this::onMouseReleased);
         
-        
+
         
 	}
+    
+    
+
 
 
     

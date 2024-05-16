@@ -18,9 +18,14 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 
+import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.geometry.Insets;
+import javafx.scene.layout.HBox;
 
-
-
+import javafx.scene.input.KeyCode;
 
 public class SceneController {
     
@@ -33,6 +38,15 @@ public class SceneController {
     static Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
     static double screenWidth = screenBounds.getWidth();
     static double screenHeight = screenBounds.getHeight();
+    
+
+    private TextField messageInput;
+    private TextArea chatDisplay;
+    
+    private final int PORT = 5050;
+
+
+
 
 	 public void showIntroScreen(Stage stage) throws IOException {
 	        this.stage = stage;
@@ -42,12 +56,23 @@ public class SceneController {
 	        VBox buttonContainer = new VBox();
 	        buttonContainer.setAlignment(Pos.CENTER); // Align the VBox contents to the center
 	        
-	        Button button1 = new Button("Button 1");
-	        button1.setOnAction(event -> switchToGame(event));
+	        HBox hbox = new HBox();
+	        
+	        Button serverButton = new Button("Start as Server");
+	        Button clientButton = new Button("Connect as Client");
 
-	        buttonContainer.getChildren().addAll(button1);
+	        
+	        hbox.getChildren().addAll(serverButton, clientButton);
 
-	        root.getChildren().add(buttonContainer);
+	        buttonContainer.getChildren().addAll( hbox );
+
+	        root.getChildren().addAll(buttonContainer);
+	        
+	        serverButton.setOnAction(event -> switchToGameServer(event, root, buttonContainer));
+	        clientButton.setOnAction(event -> switchToGameClient(event, root,buttonContainer ));
+	        
+	        
+	        
 	        stage.setScene(scene);
 	        
 	        // Set window dimensions to match screen size
@@ -60,7 +85,64 @@ public class SceneController {
 	        
 	    }
 	 
-	 public void switchToGame(ActionEvent event) {
+
+	 
+	 public void switchToGameClient(ActionEvent event, Group root_prev, VBox buttonContainer) {
+
+		 	
+	        Label nameLabel = new Label("Enter your name:");
+	        // Create text field
+	        TextField nameTextField = new TextField();
+	        
+	        Label ipLabel = new Label("Enter the Ip you want to connect:");
+	        // Create text field
+	        TextField ipTextField = new TextField();
+	        
+	        Button gameButton = new Button("Start as Game");
+	        
+	        gameButton.setOnAction(gameevent -> switchToGame(gameevent,nameTextField.getText() , Integer.parseInt(ipTextField.getText())));
+	        
+	        
+	        buttonContainer.getChildren().addAll( nameLabel, nameTextField,  ipLabel, ipTextField, gameButton);
+
+	        root_prev.getChildren().addAll(buttonContainer);
+
+
+
+		}
+	 
+	 
+	 public void switchToGameServer(ActionEvent event, Group root_prev, VBox buttonContainer) {	  
+	        Label nameLabel = new Label("Enter your name:");
+	        // Create text field
+	        TextField nameTextField = new TextField();
+	        
+	        Button gameButton = new Button("Start as Game");
+	        
+	        gameButton.setOnAction(gameevent -> {
+	            final String playerName = nameTextField.getText();
+	            
+	            Thread serverThread = new Thread(() -> {
+	                try {
+	                    System.out.println(playerName);
+	                    Server server = new Server(playerName, PORT);
+	                } catch(IOException e) {
+	                    System.out.println(e);
+	                }
+	            });
+	            
+	            serverThread.start(); // Start the server thread
+	            
+	            switchToGame(gameevent, playerName, PORT);
+	        });
+	        
+	        buttonContainer.getChildren().addAll( nameLabel, nameTextField,  gameButton);
+
+	        root_prev.getChildren().addAll(buttonContainer);
+		}
+	 
+	 
+	 private void switchToGame(ActionEvent event, String name, int port) {
 		    Group root = new Group();        
 		    Canvas canvas = new Canvas(SceneController.WINDOW_WIDTH, SceneController.WINDOW_HEIGHT);    
 		    GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -80,9 +162,48 @@ public class SceneController {
 		    sideRectangle.setFill(Color.INDIGO); 
 		    mainPane.getChildren().add(sideRectangle); 
 		    
+	        // Initialize UI components
+		    HBox senderContainer = new HBox();
+		    VBox chatContainer = new VBox();
+		    chatDisplay = new TextArea();
+		    messageInput = new TextField();
+	        
+
+	        // Set properties
+	        chatDisplay.setEditable(true);
+	        chatDisplay.setPrefWidth(340); // Set the preferred width
+	        chatDisplay.setPrefHeight(950); 
+	        senderContainer.getChildren().addAll(messageInput);
+	        chatContainer.getChildren().addAll(new ScrollPane(chatDisplay), senderContainer);
+	        
+	        try {
+	        	Client client= new Client(name, port, chatDisplay); 
+	        	
+	            messageInput.setOnKeyPressed(e -> {
+		            if (e.getCode() == KeyCode.ENTER) {
+		            	System.out.println(messageInput.getText());
+		            	client.sendMessage(messageInput.getText());
+		            	messageInput.clear();
+		    
+		            }
+		        });
+	        }catch(IOException e) {
+	        	System.out.println(e);
+	        	System.exit(0);
+	        }
+	        
+	        // Event handlers
+	
+	        
+	        chatContainer.setLayoutX(1550); // Set X position
+	        chatContainer.setLayoutY(10); // dsd
+	        chatContainer.setPrefWidth(350); // Set the preferred width
+	        chatContainer.setPrefHeight(1200);
 		   
 		   
-		    root.getChildren().addAll(mainPane, canvas);
+		    root.getChildren().addAll(mainPane, canvas, chatContainer);
+		    
+
 		    
 		    Scene scene2 = new Scene(root, SceneController.WINDOW_WIDTH, SceneController.WINDOW_HEIGHT);
 		    GameTimer gametimer = new GameTimer(gc, scene2);
@@ -92,7 +213,9 @@ public class SceneController {
 		    stage.setFullScreen(true);
 		    stage.show();
 		    gametimer.start();
-		}
+	 }
+	 
+
 
 	
 }
